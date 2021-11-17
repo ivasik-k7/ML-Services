@@ -11,33 +11,35 @@ class Keypoints {
   final List recognitions;
   final Size size;
 
-  List<Widget> calculate(double imageWidth, double imageHeight) {
+  List<Widget> render(double imageWidth, double imageHeight) {
     if (recognitions.isEmpty) return <Widget>[];
+
     final double factorX = size.width;
     final double factorY = imageHeight / imageWidth * size.width;
 
     final results = <Widget>[];
 
     for (final recognition in recognitions) {
-      Color color = Color((Random().nextDouble() * 0xFFFFFF).toInt() << 0)
-          .withOpacity(1.0);
-      var list = recognition["keypoints"].values.map<Widget>((k) {
+      final randomColor =
+          Color((Random().nextDouble() * 0xFFFFFF).toInt() << 0);
+
+      final list = recognition["keypoints"].values.map<Widget>((k) {
+        String title = 'keypoint title';
+        double left = k["x"] * factorX - 6;
+        double top = k["y"] * factorY - 6;
         return Positioned(
-          left: k["x"] * factorX - 6,
-          top: k["y"] * factorY - 6,
+          left: left,
+          top: top,
           width: 100,
           height: 12,
           child: Text(
-            "● ${k["part"]}",
-            style: TextStyle(
-              color: color,
-              fontSize: 12.0,
-            ),
+            title,
+            style: TextStyle(color: randomColor, fontSize: 12.0),
           ),
         );
       }).toList();
 
-      results..addAll(list);
+      results.addAll(list);
     }
 
     return results;

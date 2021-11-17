@@ -1,0 +1,16 @@
+0 Olive
+1 Pizza
+2 Apple
+3 Bread
+4 Bun
+5 Avocado
+6 Banana
+7 Tomato
+8 Pineapple
+9 Broccoli
+10 Cabbage
+11 Carrot
+12 Mushroom
+13 Fish
+14 Lemon
+15 Soup

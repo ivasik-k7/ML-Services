@@ -1,11 +1,10 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:segment/app/constants.dart';
 import 'package:segment/content/services/camera.service.dart';
-import 'package:segment/content/services/segmenter.service.dart';
+import 'package:segment/content/services/detector.service.dart';
 import 'package:segment/content/services/tf.abstract.dart';
 
 class MainView extends StatefulWidget {
@@ -16,17 +15,21 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-  final TensorFlowService service = SegmenterService();
+  final TensorFlowService service = DetectorService();
   final CameraService camera = CameraService();
-  XFile? _image;
+
+  double? _imgWidth;
+  double? _imgHeight;
+
+  File? _image;
   final List<Widget> _recognizes = [];
 
   @override
   void initState() {
     super.initState();
     service.loadModel(
-      AssetConstants.classifierLabels,
-      AssetConstants.classifierModel,
+      AssetConstants.segmenterModel,
+      AssetConstants.segmenterLabels,
     );
   }
 
@@ -38,12 +41,7 @@ class _MainViewState extends State<MainView> {
             onPressed: onCameraOpen,
           ),
           backgroundColor: Colors.amber.shade300,
-          body: Stack(
-            children: [
-              if (_image != null) Image.file(File(_image!.path)),
-              if (_recognizes.isNotEmpty) ..._recognizes
-            ],
-          ),
+          body: Stack(children: prepareRecognisation()),
         ),
       );
 
@@ -53,15 +51,48 @@ class _MainViewState extends State<MainView> {
     super.dispose();
   }
 
+  List<Widget> prepareRecognisation() {
+    List<Widget> results = [];
+
+    if (_image != null) {
+      results.add(Align(
+        alignment: Alignment.center,
+        child: Image.file(
+          File(_image!.path),
+          fit: BoxFit.fill,
+          width: _imgWidth,
+          height: _imgHeight,
+        ),
+      ));
+    }
+    if (_recognizes.isNotEmpty) {
+      for (final element in _recognizes) {
+        results.add(Align(
+          alignment: Alignment.center,
+          child: element,
+        ));
+      }
+    }
+
+    return results;
+  }
+
   void onCameraOpen() async => camera.open(
-        ImageSource.camera,
-        (XFile data) {
-          _image = data;
-          service.predict(_image!.path, (List<dynamic> data) {
-            for (final element in data) {
-              _recognizes.add(Image.memory(element));
-            }
-          });
+        ImageSource.gallery,
+        callback: (XFile data) {
+          final image = File(data.path);
+
+          service.predict(image.path);
+
+          FileImage(image)
+              .resolve(const ImageConfiguration())
+              .addListener((ImageStreamListener((ImageInfo info, bool _) {
+                _imgWidth = info.image.width.toDouble();
+                _imgHeight = info.image.height.toDouble();
+              })));
+
+          _image = image;
+
           notify();
         },
       );

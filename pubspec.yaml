@@ -30,9 +30,9 @@ dependencies:
     cupertino_icons: ^1.0.2
     flutter:
         sdk: flutter
+    image: ^3.0.8
     image_picker: ^0.8.4+4
-    meta: ^1.7.0
-    tflite: ^1.0.2
+    tflite: ^1.1.2
 
 dev_dependencies:
     flutter_lints: ^1.0.0
@@ -53,6 +53,10 @@ flutter:
         - assets/tensorflow/classifier/model_unquant.tflite
         - assets/tensorflow/test/deeplabv3_257_mv_gpu.tflite
         - assets/tensorflow/test/deeplabv3_257_mv_gpu.txt
+        - assets/tensorflow/test/yolov2_tiny.tflite
+        - assets/tensorflow/test/yolov2_tiny.txt
+        - assets/tensorflow/segmenter/saved_model.pb
+        - assets/tensorflow/segmenter/tfhub_module.pb
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/assets-and-images/#resolution-aware.
     # For details regarding adding assets from package dependencies, see

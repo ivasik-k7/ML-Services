@@ -1,23 +1,26 @@
+import 'package:flutter/services.dart';
 import 'package:segment/content/services/tf.abstract.dart';
 import 'package:tflite/tflite.dart';
 
 class DetectorService extends TensorFlowService {
   @override
-  Future<void> predict(String path,
-      [Function(List recognizes)? callback]) async {
-    List<dynamic>? recognitions = await Tflite.detectObjectOnImage(
-      path: path,
-      model: "SSDMobileNet",
-      imageMean: 127.5,
-      imageStd: 127.5,
-      threshold: 0.4,
-      numResultsPerClass: 2,
-      asynch: true,
-    );
+  Future<void> predict(String path, [TFServiceCallback? callback]) async {
+    try {
+      final recognitions = await Tflite.detectObjectOnImage(
+        path: path,
+        model: "YOLO",
+        threshold: 0.3,
+        imageMean: 0.0,
+        imageStd: 255.0,
+        numResultsPerClass: 1,
+      );
 
-    print(recognitions);
+      print(recognitions);
 
-    if (recognitions == null || recognitions.isNotEmpty) return;
-    if (callback != null) callback(recognitions);
+      if (recognitions == null) return;
+      if (callback != null) callback(recognitions);
+    } on PlatformException {
+      print('Detection failed!');
+    }
   }
 }
